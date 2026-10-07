@@ -19,41 +19,83 @@ $parts = [];
 for ($i = 0; $i < $ln; $i++)
 {
     $line = stream_get_line(STDIN, 1024 + 1, "\n");
-    // echo($line);
-    // echo("\n");
     $all .= $line;
 
-    if (itsEven($c)) {
+    $parts[] = itsEvenOrNot($parts, $c, $line);
+}
 
+function itsEvenOrNot(array $parts, int $c, string $line) 
+{
+    if (itsEven($c)) {
+        
     } else {
         $divide = round($c / 2);
-        $parts[] = str_split($line, $divide);
+        $parts = str_split($line, $divide);
     }
+
+    return $parts;
 }
 
 $lines = 1;
 $allArray = str_split($all, 1);
-$convert = "+0+0110++101+0100";
-// print_r($allArray);
-// echo("\n");
+$convert = "";
+
+
 if($bitmap == "B"){
     $bitmap = "C";
+    
+    $result = recursiveCheck($allArray, $parts, $r, $convert);
+}
 
-    if(in_array(".", $allArray) && in_array("#", $allArray)){
+function recursiveCheck(array $allArray, array $parts, int $r, string $convert) 
+{
+    echo("-----");
+    echo("\n");
+    print_r($allArray);
+    echo("\n");
+    print_r((in_array(".", $allArray) && in_array("#", $allArray)) == true);
+    echo("\n");
+    echo("check dot");
+    echo("\n");
+    print_r(in_array(".", $allArray));
+    echo("\n");
+    echo("check sharp");
+    echo("\n");
+    print_r(in_array("#", $allArray));
+    echo("\n");
+    echo("-----");
+
+    $dot = in_array(".", $allArray) ? 'true' : 'false';
+    $sharp = in_array("#", $allArray) ? 'true' : 'false';
+
+    if ($dot && $sharp){
+        $convert .= '+';
+
         $groupBySide = groupBySide($parts);
-        print_r(groupByUpDown($groupBySide[0], $r));
-        print_r(groupByUpDown($groupBySide[1], $r));
+        $leftSide = isset($groupBySide[0]) ? groupByUpDown($groupBySide[0], $r) : [];
+        $rightSide = isset($groupBySide[1]) ? groupByUpDown($groupBySide[1], $r) : [];
 
+        $leftSideUp = isset($leftSide[0]) ? implode($leftSide[0]) : "";
+        $leftSideDown = isset($leftSide[1]) ? implode($leftSide[1]) : "";
+        $rightSideUp = isset($rightSide[0]) ? implode($rightSide[0]) : "";
+        $rightSideDown = isset($rightSide[1]) ? implode($rightSide[1]) : "";
+        
+        if (! empty($leftSideUp)) {
+            // print_r(str_split($leftSideUp, 1));
+            // print_r($leftSide[0]);
+            // print_r(sizeof($leftSide[0]));
+            $splitLS = str_split($leftSideUp, 1);
+            $convert .= recursiveCheck($splitLS, $leftSide[0], sizeof($leftSide[0]), $convert);
 
-        echo($bitmap." ". $c." ". $r."\n");
-        echo($lines."\n");
-        echo($convert);
-    }else{
-        $value = in_array(".", $allArray) ? 0 : 1;
-        echo($bitmap." ". $c." ". $r."\n");
-        echo($lines."\n");
-        echo($value);
-    }
+            echo("\n");
+            print_r($convert);
+            echo("\n");
+        }
+    } else{
+        $convert .= in_array(".", $allArray) ? 0 : 1;
+    } 
+
+    return $convert;
 }
 
 function itsEven(int $number): bool
