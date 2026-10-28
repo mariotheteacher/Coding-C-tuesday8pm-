@@ -26,14 +26,8 @@ for ($i = 0; $i < $N; $i++)
     $isWater = [];
 
     fscanf(STDIN, "%d %d", $X, $Y);
-    $count = checkLandOrWater($Y, $X, $matrix, $isWater);
 
-    if($count > 0){
-        $isWater[$Y."".$X] = $Y."".$X;
-        $answer[] = checkWaters($Y, $X, $matrix, $isWater);
-    }else{
-        $answer[] = $count;
-    }
+    $answer[] = checkWaters($Y, $X, $matrix, $isWater);
 }
 
 for ($i = 0; $i < $N; $i++)
@@ -45,45 +39,25 @@ for ($i = 0; $i < $N; $i++)
     echo($answer[$i]."\n");
 }
 
-function checkLandOrWater($X, $Y, $matrix, &$isWater)
-{
-    if(!isset($matrix[$X][$Y])) {
-        return 0;   
-    } else {
-        return array_key_exists($X."".$Y, $isWater) ? 0 : 1;
-    }
-}
-
 function checkWaters($X, $Y, $matrix, &$isWater) {
+    if(!isset($matrix[$X][$Y])) {
+        return 0;
+    }
+
+    $key = $X.'_'.$Y;
+
+    if(isset($isWater[$key])) {
+        return 0;
+    }
+
+    $isWater[$key] = true;
+
     $count = 1;
-    $total = 0;
-    $total = isset($matrix[$X][($Y+1)]) ? checkLandOrWater($X, ($Y+1), $matrix, $isWater) : 0;
 
-    if($total > 0) {
-        $isWater[$X."".($Y+1)] = $X."".($Y+1);
-        $count += checkWaters($X, $Y+1, $matrix, $isWater);
-    }
-
-    $total = isset($matrix[$X][($Y-1)]) ? checkLandOrWater($X, ($Y-1), $matrix, $isWater) : 0;
-
-    if($total > 0) {
-        $isWater[$X."".($Y-1)] = $X."".($Y-1);
-        $count += checkWaters($X, $Y-1, $matrix, $isWater);
-    }
-
-    $total = isset($matrix[($X-1)][$Y]) ? checkLandOrWater(($X-1), $Y, $matrix, $isWater) : 0;
-
-    if($total > 0) {
-        $isWater[($X-1)."".$Y] = ($X-1)."".$Y;
-        $count += checkWaters($X-1, $Y, $matrix, $isWater);
-    }
-
-    $total = isset($matrix[($X+1)][$Y]) ? checkLandOrWater(($X+1), $Y, $matrix, $isWater) : 0;
-
-    if($total > 0) {
-        $isWater[($X+1)."".$Y] = ($X+1)."".$Y;
-        $count += checkWaters($X+1, $Y, $matrix, $isWater);
-    }
+    $count += checkWaters($X, ($Y+1), $matrix, $isWater);
+    $count += checkWaters($X, ($Y-1), $matrix, $isWater);
+    $count += checkWaters(($X-1), $Y, $matrix, $isWater);
+    $count += checkWaters(($X+1), $Y, $matrix, $isWater);
 
     return $count;
 }
